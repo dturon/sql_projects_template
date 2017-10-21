@@ -1,0 +1,2 @@
+
+CREATE SCHEMA my_project AUTHORIZATION dturon;
