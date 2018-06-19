@@ -1,6 +1,6 @@
 EXTENSION = my_project
-EXTVERSION = $(shell git tag | sort | tail -n 1)
-EXTVERSION_OLD = $(shell git tag | sort | tail -n 2 | head -n 1)
+EXTVERSION = $(shell git tag | sort -V | tail -n 1)
+EXTVERSION_OLD = $(shell git tag | sort -V | tail -n 2 | head -n 1)
 DB_HOST = localhost
 ROOT_DIR = ..
 

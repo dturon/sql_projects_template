@@ -9,8 +9,8 @@ from subprocess import check_output
 import pydoc
 import shutil
 
-EXTVERSION = check_output('git tag | sort | tail -n 1 | sed -e "s/v//"', shell=True).strip()
-EXTVERSION_OLD = check_output('git tag | sort | tail -n 2 | head -n 1 | sed -e "s/v//"', shell=True).strip()
+EXTVERSION = check_output('git tag | sort -V | tail -n 1 | sed -e "s/v//"', shell=True).strip()
+EXTVERSION_OLD = check_output('git tag | sort -V | tail -n 2 | head -n 1 | sed -e "s/v//"', shell=True).strip()
 DB_NAME = None
 DB_NAME_OLD = None
 install_filename = None
@@ -161,22 +161,50 @@ def upgrade(args):
     print command,'\n'
 
     for line in check_output(command, shell = True).split('\n'):
+        pwd = os.path.join(args.dir,line)
+        exists = os.path.exists(pwd)
         if line.startswith('sql/schema/'):
-            schema.write(open(os.path.join(args.dir,line)).read())
+            if exists:
+                schema.write(open(pwd).read())
+            else:
+                schema.write(pwd+' deleted! make drop DDL command\n')
         elif line.startswith('sql/extensions/'):
-            extensions.write(open(os.path.join(args.dir,line)).read())
+            if exists:
+                extensions.write(open(pwd).read())
+            else:
+                extensions.write(pwd+' deleted! make drop DDL command\n')
         elif line.startswith('sql/types/'):
-            types.write(open(os.path.join(args.dir,line)).read())
+            if exists:
+                types.write(open(pwd).read())
+            else:
+                types.write(pwd+' deleted! make drop DDL command\n')
+
         elif line.startswith('sql/tables/'):
-            tables.write(open(os.path.join(args.dir,line)).read())
+            if exists:
+                tables.write(open(pwd).read())
+            else:
+                tables.write(pwd+' deleted! make drop DDL command\n')
         elif line.startswith('sql/functions/'):
-            functions.write(open(os.path.join(args.dir,line)).read())
+            if exists:
+                functions.write(open(pwd).read())
+            else:
+                functions.write(pwd+' deleted! make drop DDL command\n')
         elif line.startswith('sql/triggers/'):
-            triggers.write(open(os.path.join(args.dir,line)).read())
+            if exists:
+                triggers.write(open(pwd).read())
+            else:
+                triggers.write(pwd+' deleted! make drop DDL command\n')
         elif line.startswith('sql/views/'):
-            views.write(open(os.path.join(args.dir,line)).read())
+            if exists:
+                views.write(open(pwd).read())
+            else:
+                views.write(pwd+' deleted! make drop DDL command\n')
         elif line.startswith('sql/grants/'):
-            grants.write(open(os.path.join(args.dir,line)).read())
+            if exists:
+                grants.write(open(pwd).read())
+            else:
+                grants.write(pwd+' deleted! make revoke DDL command\n')
+
         print line
     for si in [schema, extensions, types, tables, functions, triggers, views, grants]:
         f.write(si.getvalue())
